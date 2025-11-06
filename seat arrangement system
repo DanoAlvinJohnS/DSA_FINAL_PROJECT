@@ -1,0 +1,75 @@
+class Node:
+    def __init__(self, name, order_id):
+        self.name = name
+        self.order_id = order_id
+        self.next = None
+
+class SeatList:
+    def __init__(self):
+        self.head = None
+        self.count = 0
+        self.max_seats = 16
+
+    def add_order(self, name):
+        if self.count >= self.max_seats:
+            print("[ERROR] | No more seat")
+            return
+        new_node = Node(name, self.count + 1)
+        if not self.head:
+            self.head = new_node
+        else:
+            temp = self.head
+            while temp.next:
+                temp = temp.next
+            temp.next = new_node
+        self.count += 1
+        print(f"[ADDED] {name} → Seat #{new_node.order_id}")
+
+    def take_out(self, order_id):
+        temp = self.head
+        prev = None
+        while temp:
+            if temp.order_id == order_id:
+                if prev:
+                    prev.next = temp.next
+                else:
+                    self.head = temp.next
+                self.count -= 1
+                print(f"[REMOVED] Seat #{order_id} ({temp.name})")
+                return
+            prev = temp
+            temp = temp.next
+        print("[ERROR] | Order ID not found")
+
+    def to_list(self):
+        data = []
+        temp = self.head
+        while temp:
+            data.append((temp.order_id, temp.name))
+            temp = temp.next
+        return data
+
+def display(seat_data):
+    seats = [["Empty" for _ in range(4)] for _ in range(4)]
+    for order_id, name in seat_data:
+        row = (order_id - 1) // 4
+        col = (order_id - 1) % 4
+        seats[row][col] = name
+    print()
+    for row in seats:
+        print(" | ".join(f"{seat:^10}" for seat in row))
+    print()
+
+if _name_ == "_main_":
+    s = SeatList()
+    s.add_order("Alice")
+    s.add_order("Bob")
+    s.add_order("Charlie")
+    s.add_order("Diana")
+    s.add_order("Eve")
+    display(s.to_list())
+    s.take_out(3)
+    display(s.to_list())
+    for i in range(20):
+        s.add_order(f"Order{i+6}")
+    display(s.to_list())
